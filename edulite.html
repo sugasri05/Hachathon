@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EduLite - Offline Learning</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #007BFF;
+      color: white;
+      text-align: center;
+      padding: 1em;
+    }
+    main {
+      max-width: 800px;
+      margin: auto;
+      padding: 1em;
+    }
+    h2 {
+      color: #333;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: white;
+      padding: 10px;
+      margin: 10px 0;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    li:hover {
+      background: #e9f5ff;
+    }
+    button {
+      padding: 10px 15px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #218838;
+    }
+    .hidden {
+      display: none;
+    }
+    video, audio {
+      max-width: 100%;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+    }
+    footer {
+      text-align: center;
+      padding: 1em;
+      color: #777;
+      background: #eaeaea;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>EduLite</h1>
+    <p>Accessible Quality Education for All – Offline!</p>
+  </header>
+
+  <main>
+    <section id="lessons-section">
+      <h2>📚 Select a Lesson</h2>
+      <ul id="lesson-list"></ul>
+    </section>
+
+    <section id="lesson-content" class="hidden">
+      <h2 id="lesson-title"></h2>
+      <p id="lesson-text"></p>
+      <video id="lesson-video" controls class="hidden"></video>
+      <audio id="lesson-audio" controls class="hidden"></audio>
+      <button onclick="showQuiz()">Take Quiz</button>
+    </section>
+
+    <section id="quiz-section" class="hidden">
+      <h2>📝 Quiz</h2>
+      <form id="quiz-form"></form>
+      <button onclick="submitQuiz()">Submit Answers</button>
+      <p id="quiz-result"></p>
+    </section>
+  </main>
+
+  <footer>
+    <small>EduLite © 2025 | Designed for communities without reliable internet</small>
+  </footer>
+
+  <script>
+    // Sample lessons and quiz data (you can add more)
+    const lessons = [
+      {
+        id: 1,
+        title: "Introduction to Renewable Energy",
+        text: "Renewable energy comes from natural sources that are constantly replenished like sunlight, wind, and water.",
+        video: "", // Example: "renewable.mp4"
+        audio: "", // Example: "lesson1.mp3"
+        quiz: [
+          {
+            question: "What is an example of renewable energy?",
+            options: ["Coal", "Natural Gas", "Sunlight", "Diesel"],
+            correct: 2
+          },
+          {
+            question: "Why is renewable energy important?",
+            options: ["It is expensive", "It pollutes more", "It never runs out", "It is made from oil"],
+            correct: 2
+          }
+        ]
+      },
+      {
+        id: 2,
+        title: "Basic First Aid Tips",
+        text: "First aid is the immediate help given to someone who is injured before professional help arrives. It includes stopping bleeding, helping someone who fainted, or doing CPR.",
+        video: "",
+        audio: "",
+        quiz: [
+          {
+            question: "What is first aid?",
+            options: ["Surgery", "Immediate help", "Medication", "Long-term care"],
+            correct: 1
+          }
+        ]
+      }
+    ];
+
+    let currentLesson = null;
+
+    // Load lessons
+    window.onload = function () {
+      const list = document.getElementById("lesson-list");
+      lessons.forEach(lesson => {
+        const li = document.createElement("li");
+        li.textContent = lesson.title;
+        li.onclick = () => loadLesson(lesson.id);
+        list.appendChild(li);
+      });
+    };
+
+    function loadLesson(id) {
+      currentLesson = lessons.find(l => l.id === id);
+      if (!currentLesson) return;
+
+      document.getElementById("lesson-title").textContent = currentLesson.title;
+      document.getElementById("lesson-text").textContent = currentLesson.text;
+
+      const video = document.getElementById("lesson-video");
+      const audio = document.getElementById("lesson-audio");
+
+      if (currentLesson.video) {
+        video.src = currentLesson.video;
+        video.classList.remove("hidden");
+      } else {
+        video.classList.add("hidden");
+      }
+
+      if (currentLesson.audio) {
+        audio.src = currentLesson.audio;
+        audio.classList.remove("hidden");
+      } else {
+        audio.classList.add("hidden");
+      }
+
+      document.getElementById("lesson-content").classList.remove("hidden");
+      document.getElementById("quiz-section").classList.add("hidden");
+    }
+
+    function showQuiz() {
+      const form = document.getElementById("quiz-form");
+      form.innerHTML = "";
+      currentLesson.quiz.forEach((q, i) => {
+        const qDiv = document.createElement("div");
+        qDiv.innerHTML = `<p><strong>${i + 1}. ${q.question}</strong></p>`;
+        q.options.forEach((opt, idx) => {
+          qDiv.innerHTML += `
+            <label>
+              <input type="radio" name="q${i}" value="${idx}"> ${opt}
+            </label><br>`;
+        });
+        form.appendChild(qDiv);
+      });
+
+      document.getElementById("quiz-section").classList.remove("hidden");
+    }
+
+    function submitQuiz() {
+      let score = 0;
+      currentLesson.quiz.forEach((q, i) => {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        if (selected && parseInt(selected.value) === q.correct) {
+          score++;
+        }
+      });
+
+      const total = currentLesson.quiz.length;
+      document.getElementById("quiz-result").textContent = `✅ You scored ${score} out of ${total}`;
+    }
+  </script>
+</body>
+</html>
